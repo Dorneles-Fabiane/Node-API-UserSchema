@@ -8,43 +8,25 @@
 //https://www.chaijs.com/plugins/chai-json-schema/
 //https://developer.mozilla.org/pt-PT/docs/Web/HTTP/Status (http codes)
 
-const app =  require('../src/index.js');
+const app = require('../src/index.js');
 
 const assert = require('assert');
 const chai = require('chai')
 const chaiHttp = require('chai-http');
 const chaiJson = require('chai-json-schema');
+const User = require('../src/models/User.js');
 
 chai.use(chaiHttp);
 chai.use(chaiJson);
 
 const expect = chai.expect;
 
-//Define o minimo de campos que o usuário deve ter. Geralmente deve ser colocado em um arquivo separado
-const userSchema = {
-    title: "Schema do Usuario, define como é o usuario, linha 24 do teste",
-    type: "object",
-    required: ['nome', 'email', 'idade'],
-    properties: {
-        nome: {
-            type: 'string'
-        },
-        email: {
-            type: 'string'
-        },
-        idade: {
-            type: 'number',
-            minimum: 18
-        }
-    }
-}
-
 //Inicio dos testes
 
 //este teste é simplesmente pra enteder a usar o mocha/chai
 describe('Um simples conjunto de testes', function () {
     it('deveria retornar -1 quando o valor não esta presente', function () {
-        assert.equal([1, 2, 3].indexOf(4), -1);
+        assert.strictEqual([1, 2, 3].indexOf(4), -1);
     });
 });
 
@@ -66,18 +48,23 @@ describe('Testes da aplicaçao',  () => {
         .end(function (err, res) {
         expect(err).to.be.null;
         expect(res).to.have.status(200);
-        expect(res.body.rows).to.eql([]);
+        expect(res.body).to.eql([]);
         done();
         });
     });
 
     it('deveria criar o usuario raupp', function (done) {
+        let user = {
+            name: "raupp", 
+            email: "jose.raupp@devoz.com.br", 
+            age: 35
+        }
         chai.request(app)
         .post('/user')
-        .send({nome: "raupp", email: "jose.raupp@devoz.com.br", idade: 35})
+        .send(user)
         .end(function (err, res) {
             expect(err).to.be.null;
-            expect(res).to.have.status(201);
+            expect(res).to.have.status(200);
             done();
         });
     });
@@ -87,9 +74,9 @@ describe('Testes da aplicaçao',  () => {
         chai.request(app)
         .get('/user/naoExiste')
         .end(function (err, res) {
-            expect(err.response.body.error).to.be.equal('User not found'); //possivelmente forma errada de verificar a mensagem de erro
+           // expect(err.response.body.error).to.be.equal(404); //possivelmente forma errada de verificar a mensagem de erro
             expect(res).to.have.status(404);
-            expect(res.body).to.be.jsonSchema(userSchema);
+            expect(res.body).to.be.jsonSchema(User);
             done();
         });
     });
@@ -100,7 +87,7 @@ describe('Testes da aplicaçao',  () => {
         .end(function (err, res) {
             expect(err).to.be.null;
             expect(res).to.have.status(200);
-            expect(res.body).to.be.jsonSchema(userSchema);
+            expect(res.body).to.be.jsonSchema(User);
             done();
         });
     });
@@ -111,7 +98,7 @@ describe('Testes da aplicaçao',  () => {
         .end(function (err, res) {
             expect(err).to.be.null;
             expect(res).to.have.status(200);
-            expect(res.body).to.be.jsonSchema(userSchema);
+            expect(res.body).to.be.jsonSchema(User);
             done();
         });
     });
@@ -121,20 +108,112 @@ describe('Testes da aplicaçao',  () => {
         .get('/user/raupp')
         .end(function (err, res) {
             expect(err).to.be.null;
-            expect(res).to.have.status(200);
-            expect(res.body).to.be.jsonSchema(userSchema);
+            expect(res).to.have.status(404);
+            expect(res.body).to.be.jsonSchema(User);
             done();
         });
     });
 
-    it('deveria ser uma lista com pelomenos 5 usuarios', function (done) {
+    it('deveria criar usuária Fabiane', function(done) {
+        const fabiane = {
+            name: "Fabiane",
+            email: "fabiane.mail.d@gmail.com",
+            age: 25,
+        };
+        chai.request(app)
+        .post('/user')
+        .send(fabiane)
+        .end(function (err, res) {
+            expect(err).to.be.null;
+            expect(res).to.have.status(200);
+            done();
+        });
+    });
+
+    it('deveria criar usuário Diuliam', function(done) {
+        const diuliam = {
+            name: "Diuliam",
+            email: "diuliam@gmail.com",
+            age: 31,
+        };
+        chai.request(app)
+        .post('/user')
+        .send(diuliam)
+        .end(function (err, res) {
+            expect(err).to.be.null;
+            expect(res).to.have.status(200);
+            done();
+        });
+    });
+
+    it('deveria criar usuário Paula', function(done) {
+        const paula = {
+            name: "Paula",
+            email: "paula@gmail.com",
+            age: 32,
+        };
+        chai.request(app)
+        .post('/user')
+        .send(paula)
+        .end(function (err, res) {
+            expect(err).to.be.null;
+            expect(res).to.have.status(200);
+            done();
+        });
+    });
+
+    it('deveria criar usuário Eduarda', function(done) {
+        const eduarda = {
+            name: "Eduarda",
+            email: "eduarda@gmail.com",
+            age: 52,
+        };
+        chai.request(app)
+        .post('/user')
+        .send(eduarda)
+        .end(function (err, res) {
+            expect(err).to.be.null;
+            expect(res).to.have.status(200);
+            done();
+        });
+    });
+
+    it('deveria criar usuário Joana', function(done) {
+        const joana = {
+            name: "Joana",
+            email: "joana@gmail.com",
+            age: 15,
+        };
+        chai.request(app)
+        .post('/user')
+        .send(joana)
+        .end(function (err, res) {
+            expect(err).to.be.null;
+            expect(res).to.have.status(200);
+            done();
+        });
+    });
+    
+
+    it('deveria ser uma lista com pelo menos 5 usuarios', function (done) {
         chai.request(app)
         .get('/users')
         .end(function (err, res) {
         expect(err).to.be.null;
         expect(res).to.have.status(200);
-        expect(res.body.total).to.be.at.least(5);
+        expect(res.body.length).to.be.at.least(5);
         done();
+        });
+    });
+
+    it('deveria alterar o nome da usuária Fabiane para Maria', function (done) {
+        chai.request(app)
+        .patch('/user/Fabiane/Maria')
+        .end(function (err, res) {
+            expect(err).to.be.null;
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.jsonSchema(User);
+            done();
         });
     });
 })
